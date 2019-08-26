@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Пенсия</title>
+    <script src="https://www.google.com/jsapi"></script>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript">
+
+        google.load("visualization", "1", { packages: ["corechart"] });
+
+        function validateForm() {
+            if (document.getElementById("p1").value == "") {
+                alert("Поле 'Пенсионные взносы (___ руб. в месяц)' Должно быть заполнено");
+                return false;
+            }
+            if (document.getElementById("p2").value == "") {
+                alert("Поле 'Первый месяц выплат' Должно быть заполнено");
+                return false;
+            }
+            if (document.getElementById("p3").value == "") {
+                alert("Поле 'Первый год выплат' Должно быть заполнено");
+                return false;
+            }
+            if (document.getElementById("p4").value == "") {
+                alert("Поле 'Последний месяц выплат' Должно быть заполнено");
+                return false;
+            }
+            if (document.getElementById("p5").value == "") {
+                alert("Поле 'Последний год выплат' Должно быть заполнено");
+                return false;
+            }
+            return true;
+        }
+
+        function getSum() {
+            do {
+                var zn1 = document.getElementById("p1").value;//3000;
+            } while (zn1 <= 0)
+
+            do {
+                var vm = document.getElementById("p2").value;//1;
+            } while ((vm <= 0) || (vm >= 13))
+
+            do {
+                var vy = document.getElementById("p3").value;//1990;
+            } while ((vy <= 1930) || (vy >= 2100))
+
+            do {
+                var nm = document.getElementById("p4").value;//1;
+            } while ((nm <= 0) || (nm >= 13))
+
+            do {
+                var ny = document.getElementById("p5").value;//2010;
+            } while ((ny <= 1930) || (ny >= 2100))
+
+            var ln, sm, smm;
+            ln = 12 * (ny - vy) + (nm - vm);
+            sm = zn1 * ln;
+            return sm;
+        }
+
+
+        function getAr(sm) {
+            var ar = new Array(4);
+            for (var i = 0; i < ar.length; i++) {
+                ar[i] = sm / ((i + 1) * 5 * 12)
+            }
+            return ar;
+        }
+
+        function getArr(sm) {
+            var arr = new Array(4);
+            for (var j = 0; j < arr.length; j++) {
+                arr[j] = sm / ((j + 1) * 5)
+            }
+            return arr;
+        }
+
+
+        function printSum() {
+            if (validateForm()) {
+                var sumRow = document.getElementById("sumRow");
+                sumRow.style.display = "block";
+                document.getElementById("sum").innerHTML = getSum();
+            }
+        }
+
+
+        function drawChart() {
+            if (validateForm()) {
+                var chart = document.getElementById("chart");
+                chart.style.display = "block";
+                var sm = getSum();
+                var ar = getAr(sm);
+                var arr = getArr(sm);
+                var data = google.visualization.arrayToDataTable([
+                    ['Годы выплат', 'Пенсия в месяц', 'Пенсия в год'],
+                    ['5 лет', ar[0], arr[0]],
+                    ['10 лет', ar[1], arr[1]],
+                    ['15', ar[2], arr[2]],
+                    ['20', ar[3], arr[3]]
+                ]);
+                var options = {
+                    title: 'Пенсия',
+                    hAxis: { title: 'Годы' },
+                    vAxis: { title: 'Рубли' }
+                };
+                var chart = new google.visualization.ColumnChart(document.getElementById('pen'));
+                chart.draw(data, options);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="row">
+        <div class="column" style="width: 20%">
+            <img src="1500375358186693408.jpg" />
+        </div>
+        <div class="column" style="width: 80%; text-align: center; color:rgb(14, 13, 105)">
+            <br />
+            <br />
+            <h1>
+                Добро пожаловать на бесплатный информационный ресурс, который поможет вам посчитать пенсионные взносы в НПФ
+            </h1>
+        </div>
+    </div>
+    <div class="row" style="width: 90%; margin: auto">
+        <div class="card">
+            <h2 style="text-align:center">
+                Заполните поля
+            </h2>
+            <div class="highlight">
+                <p>
+                    <div class="column w-20"> Имя: </div>
+                    <input type="text" size="30" id="Name">
+                </p>
+            </div>
+            <div class="highlight">
+                <p>
+                    <div class="column w-20"> Пол: </div>
+                    <input type="text" size="30" id="sex">
+                </p>
+            </div>
+            <div class="highlight">
+                <p>
+                    <div class="column w-20"> Пенсионные взносы (___ руб. в месяц): </div>
+                    <input type="text" size="30" id="p1">
+                </p>
+            </div>
+            <div class="highlight">
+                <p>
+                    <div class="column w-20"> Первый месяц выплат: </div>
+                    <input type="text" size="30" id="p2">
+                </p>
+            </div>
+            <div class="highlight">
+                <p>
+                    <div class="column w-20"> Первый год выплат: </div>
+                    <input type="text" size="30" id="p3">
+                </p>
+            </div>
+            <div class="highlight">
+                <p>
+                    <div class="column w-20"> Последний месяц выплат: </div>
+                    <input type="text" size="30" id="p4">
+                </p>
+            </div>
+            <div class="highlight">
+                <p>
+                    <div class="column w-20"> Последний год выплат: </div>
+                    <input type="text" size="30" id="p5">
+                </p>
+            </div>
+            <div class="highlight">
+                <input type="button" value="Открыть график" onclick="drawChart()">
+            </div>
+            <div id="chart" class="row" style="width: 90%; margin: auto; display:none">
+                <br />
+                <div id="pen" style="width: 1200px; height: 800px;"></div>
+            </div>
+            <div class="highlight">
+                <input type="button" value="Открыть сумму накопленную в фонде" onclick="printSum()">
+            </div>
+            <div id="sumRow" class="highlight" style="display:none">
+                <p>
+                    <div class="column w-20"> Cумма, накопленная в фонде: </div>
+                    <div id="sum" style="color: yellow"></div>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy 2019 Все права защищены</p>
+    </div>
+</body>
+</html>
